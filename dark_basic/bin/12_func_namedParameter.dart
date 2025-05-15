@@ -2,9 +2,9 @@
   named parameter : 이름이 있는 파라미터. 순서가 필요 없음
  */
 void main() {
-  addNumbers(y: 10, x: 5, z: 20);
+  addNumbers(z: 10, y: 5, x: 20);
   addNumbers2(y: 10, x: 5);
-  addNumbers2(y: 10, x: 5, z: 20);
+  addNumbers2(y: 10, x: 5, z:20);
 
   print(addNumbers3(y: 10, x: 20));
   print('----------------------------');
@@ -41,7 +41,7 @@ addNumbers2({
 }
 
 // return이 있는 함수
-int addNumbers3({
+addNumbers3({
   required int x,
   required int y,
   int z = 50  // required를 빼고 기본값을 넣어주면 optional parameter(값이 들엉와도 되고, 안들어와도 되고)
@@ -53,7 +53,7 @@ int addNumbers3({
   return sum;
 }
 
-int addNumbers4(int x, {required int y, int z = 50}) {
+addNumbers4(int x, {required int y, int z = 50}) {
   int sum = x + y + z;
   print('x : $x');
   print('y : $y');
@@ -61,10 +61,10 @@ int addNumbers4(int x, {required int y, int z = 50}) {
   return sum;
 }
 
-int addNumbers5(int x, {required int y, int z = 50}) {
+addNumbers5(int x, {required int y, int z = 50}) {
   int sum = x + y + z;
   return sum;
 }
 
 // addNumbers5를 화살표 함수로
-int addNumbers6(int x, {required int y, int z = 50}) => x + y + z;
+addNumbers6(int x, {required int y, int z = 50}) => x + y + z;

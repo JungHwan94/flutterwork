@@ -1,9 +1,9 @@
 /*
-    - Future와 Stream 비동기 처리시 사용
-      다른점: Future -> 딱 1번만 받아옴
+  - Future와  Stream 비동기 처리시 사용
+    다른 점 : Future -> 딱 1번만 받아옴
              Stream -> 여러번 받아옴
     - async / await / Future : 1회만 응답을 받을 때(동기처리)
-    - async* / await / Stream : 지속적으로 응답을 받을 때
+    - async* / yield / Stream : 지속적으로 응답을 받을 때
 
     * Future(javascript Promise와 동일)
       싱글스레드 환경에서 비동기 처리를 함.

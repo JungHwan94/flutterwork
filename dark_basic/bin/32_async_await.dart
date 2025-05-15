@@ -13,7 +13,7 @@ void main() async{
   print('결과의 합계 : ${result + result2}');
 }
 
-Future<int> addNumbers(int num1, int num2) async{
+addNumbers(int num1, int num2) async{
   print('계산 시작 : $num1 + $num2');
 
   await Future.delayed(Duration(seconds: 2), () {
