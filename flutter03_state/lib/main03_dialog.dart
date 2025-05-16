@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 /*
-  * 부모의 state를 자식이 변경하기
-    1. 부모에서 수정 함수 만들기
-    2. 자식은 state에 보내기(보내고, 등록하고, 사용)
+  * dialog 창 만들기
+
+  - 매개변수로 context를 받아 사용하는 위젯들
+    showDialog()
+    Navigator()
+    Theme.of()
+    Scaffold.of()
  */
 void main() {
   runApp(
@@ -20,15 +24,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  var num = 1;
   var name = ['홍길동', '더조은', '빛나리'];
-  var total = 3;
-
-  // 1. 수정함수 만들기
-  addFriend() {
-    setState(() {
-      total++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +36,7 @@ class _MyAppState extends State<MyApp> {
             showDialog(
                 context: context,
                 builder: (context) {
-                  // 2. 자식에게 보내기
-                  return CustomDialog(friendState : addFriend);
+                  return CustomDialog();
                 }
             );
           }
@@ -48,7 +44,7 @@ class _MyAppState extends State<MyApp> {
       appBar: AppBar(
         backgroundColor: Color(0xFFf3edf7),
         leading: Icon(Icons.list),
-        title: Text(total.toString()),
+        title: Text('주소록'),
         actions: [Icon(Icons.search), Icon(Icons.share)],
       ),
       body: ListView.builder(
@@ -66,9 +62,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 class CustomDialog extends StatelessWidget {
-// 3. 자식은 등록하기   매개변수에 넣고 (this.이름), 변수 만들기
-  const CustomDialog({super.key, this.friendState});
-  final friendState;
+  const CustomDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -79,19 +73,8 @@ class CustomDialog extends StatelessWidget {
         child: Column(
           children: [
             TextField(),
-            // 3. 사용하기
-            Text(),
-            TextButton(
-                onPressed: (){
-                  friendState();  // 함수 호출시 괄호 붙여준다
-                  Navigator.pop(context);
-                },
-                child: Text('완료')),
-            TextButton(
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-                child: Text('취소'))
+            TextButton(onPressed: (){ }, child: Text('완료')),
+            TextButton(onPressed: (){ Navigator.pop(context); }, child: Text('취소'))
           ],
         ),
       ),
