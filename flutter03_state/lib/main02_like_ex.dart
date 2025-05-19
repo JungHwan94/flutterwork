@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-/*
-  * state(변수)
-    : 일반변수와 다른점은 변경이되면 재렌더링을 해줌
-    > state변수를 사용하려면 StatefulWidget 안에서 사용
- */
+
 void main() {
   runApp(MyApp());
 }
