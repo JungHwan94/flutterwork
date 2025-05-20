@@ -40,7 +40,7 @@ class _MyAppState extends State<MyApp> {
     var result = await http.get(Uri.parse('https://jioneproferssor.store/flutter/data/data.json'));
     print(result.body);
 
-    // json을 List로 변환  [{Map},{},{}]
+    // json을 List로 변환  [{},{},{}]
     print(jsonDecode(result.body));
 
     var feedItems = jsonDecode(result.body);

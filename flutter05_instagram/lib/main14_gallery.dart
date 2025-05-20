@@ -6,8 +6,6 @@ import 'package:flutter/rendering.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
-import 'package:intl/intl.dart';
 /*
   폰에 저장된 사진 가져오기
   외부라이브러리 image_picker: ^1.1.2
@@ -35,30 +33,6 @@ class _MyAppState extends State<MyApp> {
   var tab = 0;
   var feedItems = [];
   var userImage;
-  var userContent;
-
-  setUserContent(newContent) {
-    setState(() {
-      userContent = newContent;
-    });
-  }
-
-  addMyData() {
-    String formattedDate = DateFormat('MMM dd').format(DateTime.now());
-
-    var myData = {
-      "id": feedItems.length,
-      "image": userImage,
-      "likes": 0,
-      "date": formattedDate,
-      "content": userContent,
-      "liked": false,
-      "user": "Jennifer"
-    };
-    setState(() {
-      feedItems.insert(0, myData);
-    });
-  }
 
   @override
   void initState() {
@@ -102,13 +76,7 @@ class _MyAppState extends State<MyApp> {
 
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => Upload(
-                            userImage : userImage,
-                            setUserContent : setUserContent,
-                            addMyData : addMyData
-                        )
-                    )
+                    MaterialPageRoute(builder: (context) => Upload(userImage : userImage))
                 );
               },
               icon: Icon(Icons.add_box_outlined)
@@ -187,9 +155,7 @@ class _HomeState extends State<Home> {
           itemBuilder: (c, i) {
             return Column(
               children: [
-                widget.feedItems[i]['image'].runtimeType == String
-                    ? Image.network(widget.feedItems[i]['image'])
-                    : Image.file(widget.feedItems[i]['image']),
+                Image.network(widget.feedItems[i]['image']),
                 Container(
                     padding: EdgeInsets.all(20),
                     width: double.infinity,
@@ -213,32 +179,17 @@ class _HomeState extends State<Home> {
 }
 
 class Upload extends StatelessWidget {
-  const Upload({super.key, this.userImage, this.setUserContent, this.addMyData});
+  const Upload({super.key, this.userImage});
   final userImage;
-  final setUserContent;
-  final addMyData;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-              onPressed: (){
-                addMyData();
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.send)
-          )
-        ],
-      ),
+      appBar: AppBar(),
       body: Column(
         children: [
           Text('이미지 업로드 화면'),
           Image.file(userImage),
-          TextField(onChanged: (text) {
-            setUserContent(text);
-          },),
           IconButton(
               onPressed: (){
                 Navigator.pop(context);

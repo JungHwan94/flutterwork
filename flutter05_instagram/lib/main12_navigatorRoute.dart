@@ -4,22 +4,19 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/rendering.dart';
 
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-
-import 'package:intl/intl.dart';
 /*
-  폰에 저장된 사진 가져오기
-  외부라이브러리 image_picker: ^1.1.2
-  import해주기
-  iOS는 권한설정
+  Navigator : 화면간의 이동을 관리하는 스택구조의 내비게이션 시스템
+  - Navigator.push(context, route) : 새로운 화면을 스택 위에 추가
+  - Navigator.pop(context) : 현재 화면을 스택에서 제거하고 이전화면이 보임
+  - Navigator.pushNamed(context, routeName) : 이름으로 등록된 경로로 이동
+  - Navigator.pushReplacement(context, route) : 현재 화면을 새 화면으로 교체
+  - Navigator.popUntil(context, predicate) : 특정 조건을 만족할 때까지 뒤로 감
  */
-
 void main() {
   runApp(
       MaterialApp(
-        theme: theme,
-        home: const MyApp(),
+          theme: theme,
+          home: const MyApp()
       )
   );
 }
@@ -34,31 +31,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   var tab = 0;
   var feedItems = [];
-  var userImage;
-  var userContent;
-
-  setUserContent(newContent) {
-    setState(() {
-      userContent = newContent;
-    });
-  }
-
-  addMyData() {
-    String formattedDate = DateFormat('MMM dd').format(DateTime.now());
-
-    var myData = {
-      "id": feedItems.length,
-      "image": userImage,
-      "likes": 0,
-      "date": formattedDate,
-      "content": userContent,
-      "liked": false,
-      "user": "Jennifer"
-    };
-    setState(() {
-      feedItems.insert(0, myData);
-    });
-  }
 
   @override
   void initState() {
@@ -91,24 +63,10 @@ class _MyAppState extends State<MyApp> {
         title: Text('Instagram'),
         actions: [
           IconButton(
-              onPressed: () async{
-                var picker = ImagePicker();
-                var image = await picker.pickImage(source: ImageSource.gallery);
-                // ImageSource.camera  -> 카메라로 직접 찍음
-                // picker.pickMultiImage() -> 이미지 여러개 선택. 리스트로 들어옴
-                if(image != null) {
-                  userImage = File(image.path);
-                }
-
+              onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => Upload(
-                            userImage : userImage,
-                            setUserContent : setUserContent,
-                            addMyData : addMyData
-                        )
-                    )
+                    MaterialPageRoute(builder: (context) => Upload())
                 );
               },
               icon: Icon(Icons.add_box_outlined)
@@ -144,9 +102,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   var scroll = ScrollController();
-  bool isLoading = false;
-  bool hasMore = true;
-  int page = 1;
 
   @override
   void initState() {
@@ -159,23 +114,15 @@ class _HomeState extends State<Home> {
   }
 
   getMore() async{
-    if(isLoading || !hasMore) {
-      return;
-    }
-    var result = await http.get(Uri.parse('https://jioneproferssor.store/flutter/data/data$page.json'));
+    var result = await http.get(Uri.parse('https://jioneproferssor.store/flutter/data/data2.json'));
     if(result.statusCode == 200) {
       var result2 = jsonDecode(result.body);
-      if(result2.isEmpty) {
-        hasMore = false;
-      } else {
-        widget.addData(result2);
-        page++;
+      for(var item in result2) {
+        widget.addData(item);
       }
     } else {
-      hasMore = false;
       throw Exception('get server data 실패');
     }
-    isLoading = false;
   }
 
   @override
@@ -187,9 +134,7 @@ class _HomeState extends State<Home> {
           itemBuilder: (c, i) {
             return Column(
               children: [
-                widget.feedItems[i]['image'].runtimeType == String
-                    ? Image.network(widget.feedItems[i]['image'])
-                    : Image.file(widget.feedItems[i]['image']),
+                Image.network(widget.feedItems[i]['image']),
                 Container(
                     padding: EdgeInsets.all(20),
                     width: double.infinity,
@@ -213,32 +158,15 @@ class _HomeState extends State<Home> {
 }
 
 class Upload extends StatelessWidget {
-  const Upload({super.key, this.userImage, this.setUserContent, this.addMyData});
-  final userImage;
-  final setUserContent;
-  final addMyData;
+  const Upload({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-              onPressed: (){
-                addMyData();
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.send)
-          )
-        ],
-      ),
+      appBar: AppBar(),
       body: Column(
         children: [
           Text('이미지 업로드 화면'),
-          Image.file(userImage),
-          TextField(onChanged: (text) {
-            setUserContent(text);
-          },),
           IconButton(
               onPressed: (){
                 Navigator.pop(context);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter05_instagram/style.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/rendering.dart';
 
 void main() {
   runApp(
@@ -30,7 +31,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   getData() async {
-    await Future.delayed(Duration(seconds: 3));
     var result = await http.get(Uri.parse('https://jioneproferssor.store/flutter/data/data.json'));
     if(result.statusCode == 200) {
       var result2 = jsonDecode(result.body);
@@ -42,6 +42,12 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  addData(item) {
+    setState(() {
+      feedItems.add(item);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,10 +57,11 @@ class _MyAppState extends State<MyApp> {
           IconButton(
               onPressed: () {
               },
-              icon: Icon(Icons.add_box_outlined))
+              icon: Icon(Icons.add_box_outlined)
+          )
         ],
       ),
-      body: [Home(feedItems : feedItems), Text('Shop Page')][tab],
+      body: [Home(feedItems : feedItems, addData : addData), Text('Shop Page')][tab],
       bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           showUnselectedLabels: false,
@@ -72,28 +79,59 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class Home extends StatelessWidget {
-  const Home({super.key, this.feedItems});
+class Home extends StatefulWidget {
+  const Home({super.key, this.feedItems, this.addData});
   final feedItems;
+  final addData;
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  var scroll = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    scroll.addListener((){
+      if(scroll.position.pixels == scroll.position.maxScrollExtent) {
+        getMore();
+      }
+    });
+  }
+
+  getMore() async{
+    var result = await http.get(Uri.parse('https://jioneproferssor.store/flutter/data/data2.json'));
+    if(result.statusCode == 200) {
+      var result2 = jsonDecode(result.body);
+      for(var item in result2) {
+        widget.addData(item);
+      }
+    } else {
+      throw Exception('get server data 실패');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if(feedItems.isNotEmpty) {
+    if(widget.feedItems.isNotEmpty) {
       return ListView.builder(
-          itemCount: 3,
+          controller: scroll,
+          itemCount: widget.feedItems.length,
           itemBuilder: (c, i) {
             return Column(
               children: [
-                Image.network(feedItems[i]['image']),
+                Image.network(widget.feedItems[i]['image']),
                 Container(
                     padding: EdgeInsets.all(20),
                     width: double.infinity,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('좋아요  ${feedItems[i]['likes']}'),
-                        Text('글쓴이  ${feedItems[i]['user']}'),
-                        Text('내용  ${feedItems[i]['content']}')
+                        Text('좋아요  ${widget.feedItems[i]['likes']}'),
+                        Text('글쓴이  ${widget.feedItems[i]['user']}'),
+                        Text('내용  ${widget.feedItems[i]['content']}')
                       ],
                     )
                 ),
@@ -102,7 +140,6 @@ class Home extends StatelessWidget {
           }
       );
     } else {
-      // return Text('로딩중');
       return Center(child: CircularProgressIndicator());
     }
   }
