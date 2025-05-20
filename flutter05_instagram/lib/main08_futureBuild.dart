@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter05_instagram/style.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/rendering.dart';  // 스크롤에 관련된 함수 모음
 /*
-  * 무한 스크롤
-    스크롤이 바닥에 닿으면 데이터를 얻어와서 보여주기
+  * Future 객체 : 미래에 완료될 작업의 결과를 나타내는 객체
+    서버에서 데이터를 가져오거나, 파일을 읽는 등 비동기 작업의 결과를 다룰 때 사용
 
-    1. import하기
-    2. 스크롤의 상태를 파악하기 위해 Home을 stateful로 변경
+  * FutureBuilder() : Future 객체를 기다렸다가 UI로 자동 반영
+    Future를 기다리는 동안엔 로딩 위젯을 보여주고 완료되면 데이터 화면에 자동으로 표시
+    - 나중에 추가되는 데이터는 넣기가 힘들다. 보통 고정적인 데이터에 사용
  */
 void main() {
   runApp(
@@ -37,6 +37,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   getData() async {
+    await Future.delayed(Duration(seconds: 3));
     var result = await http.get(Uri.parse('https://jioneproferssor.store/flutter/data/data.json'));
     if(result.statusCode == 200) {
       var result2 = jsonDecode(result.body);
@@ -57,11 +58,11 @@ class _MyAppState extends State<MyApp> {
           IconButton(
               onPressed: () {
               },
-              icon: Icon(Icons.add_box_outlined)
-          )
+              icon: Icon(Icons.add_box_outlined))
         ],
       ),
-      body: [Home(feedItems : feedItems), Text('Shop Page')][tab],
+      // future: feedItems -> Future 객체를 넣는다. Future는 함수로 되어 있어야 됨
+      // body: [FutureBuilder(future: feedItems, builder: (context, snapshot){return Home(feedItems: snapshot.data);}), Text('Shop Page')][tab],
       bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           showUnselectedLabels: false,
@@ -79,52 +80,28 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key, this.feedItems});
   final feedItems;
 
   @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  // 스크롤바의 위치를 기록해주는 함수
-  var scroll = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    // 스크롤 이벤트리스너를 한번 등록
-    scroll.addListener((){
-      // print('스크롤의 위치 변함');
-      // print(scroll.position.pixels);  // 스크롤이 위에서 부터 얼마나 내려왔는지 높이
-      // print(scroll.position.maxScrollExtent);  // 스크롤바를 최대 내릴수 있는 높이
-      // print(scroll.position.userScrollDirection);   // 스크롤이 되는 방향
-      if(scroll.position.pixels == scroll.position.maxScrollExtent) {
-        print('더이상 스크롤될게 없습니다');
-      }
-    });  // addListener() : 리스너 스크롤될 때 마다 호출
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if(widget.feedItems.isNotEmpty) {
+    if(feedItems.isNotEmpty) {
       return ListView.builder(
-          controller: scroll,
           itemCount: 3,
           itemBuilder: (c, i) {
             return Column(
               children: [
-                Image.network(widget.feedItems[i]['image']),
+                Image.network(feedItems[i]['image']),
                 Container(
                     padding: EdgeInsets.all(20),
                     width: double.infinity,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('좋아요  ${widget.feedItems[i]['likes']}'),
-                        Text('글쓴이  ${widget.feedItems[i]['user']}'),
-                        Text('내용  ${widget.feedItems[i]['content']}')
+                        Text('좋아요  ${feedItems[i]['likes']}'),
+                        Text('글쓴이  ${feedItems[i]['user']}'),
+                        Text('내용  ${feedItems[i]['content']}')
                       ],
                     )
                 ),
@@ -133,6 +110,7 @@ class _HomeState extends State<Home> {
           }
       );
     } else {
+      // return Text('로딩중');
       return Center(child: CircularProgressIndicator());
     }
   }

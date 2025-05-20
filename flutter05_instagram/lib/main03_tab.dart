@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter05_instagram/style.dart';
 /*
-  * 슬라이드
-    PageView() 사용
+  * 탭 만들기
+    순서
+    1. state에 tab의 현재상태 저장
+    2. state에 따라 tab이 어떻게 보일지 작성
+    3. 유저가 쉽게 state 조작할 수 있는 조작기능
  */
+
 void main() {
   runApp(
       MaterialApp(

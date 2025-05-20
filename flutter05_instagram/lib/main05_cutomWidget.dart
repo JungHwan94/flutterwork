@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter05_instagram/style.dart';
-/*
-  * 슬라이드
-    PageView() 사용
- */
+
 void main() {
   runApp(
       MaterialApp(
@@ -36,13 +33,7 @@ class _MyAppState extends State<MyApp> {
               icon: Icon(Icons.add_box_outlined))
         ],
       ),
-      body: PageView(
-        children: [
-          Center(child: Text('Home Page')),
-          Center(child: Text('Shop Page')),
-          Center(child: Text('Profile Page')),
-        ],
-      ),
+      body: [Home(), Text('Shop Page')][tab],
       bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,
           showUnselectedLabels: false,
@@ -56,6 +47,36 @@ class _MyAppState extends State<MyApp> {
             BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), label: 'Shop')
           ]
       ),
+    );
+  }
+}
+
+class Home extends StatelessWidget {
+  const Home({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        itemCount: 3,
+        itemBuilder: (c, i) {
+          return Column(
+            children: [
+              Image.asset('assets/img/profile1.jpg'),
+              Container(
+                  padding: EdgeInsets.all(20),
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('좋아요  50'),
+                      Text('글쓴이'),
+                      Text('글내용')
+                    ],
+                  )
+              ),
+            ],
+          );
+        }
     );
   }
 }
