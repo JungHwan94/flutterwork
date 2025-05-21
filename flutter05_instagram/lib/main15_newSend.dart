@@ -8,12 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'package:intl/intl.dart';
-/*
-  폰에 저장된 사진 가져오기
-  외부라이브러리 image_picker: ^1.1.2
-  import해주기
-  iOS는 권한설정
- */
 
 void main() {
   runApp(

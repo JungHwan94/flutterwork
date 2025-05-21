@@ -8,6 +8,11 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/*
+  * 로컬 저장 공간
+    : shared preferences
+ */
+
 void main() {
   runApp(
       MaterialApp(
@@ -30,25 +35,28 @@ class _MyAppState extends State<MyApp> {
   var userImage;
   var userContent;
 
-  saveData() async {
+  saveData() async{
     final storage = await SharedPreferences.getInstance();
-    List<String> stringList = feedItems.map((item) => jsonEncode(item)).toList();
-    await storage.setStringList('items', stringList);
-  }
+    storage.setString('name', 'Laura');
+    print('이름 = ${storage.get('name')}');
 
-  loadData() async {
-    final storage = await SharedPreferences.getInstance();
-    List<String>? stringList = storage.getStringList('items');
-    if(stringList != null) {
-      List<Map<String, dynamic>> restorage =
-      stringList.map((item) => jsonDecode(item) as Map<String, dynamic>).toList();
+    storage.setInt('num', 5);
+    print('num = ${storage.get('num')}');
 
-      setState(() {
-        feedItems = restorage;
-      });
-    } else {
-      getData();
-    }
+    storage.setStringList('list', ['list1', 'list2']);
+    print(storage.get('list'));
+    print(storage.getStringList('list')?[0]);
+
+    storage.remove('num');
+    print('num = ${storage.get('num')}');
+
+    var map = {'age' : 20};
+    storage.setString('map', jsonEncode(map));
+    var mapResult = storage.get('map');
+    print('map = $mapResult');
+
+    var result = storage.getString('map') ?? '비어있음';
+    print(jsonDecode(result)['age']);
   }
 
   setUserContent(newContent) {
@@ -59,6 +67,7 @@ class _MyAppState extends State<MyApp> {
 
   addMyData() {
     String formattedDate = DateFormat('MMM dd').format(DateTime.now());
+
     var myData = {
       "id": feedItems.length,
       "image": userImage,
@@ -71,13 +80,13 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       feedItems.insert(0, myData);
     });
-    saveData();
   }
 
   @override
   void initState() {
     super.initState();
-    loadData();
+    saveData();
+    getData();
   }
 
   getData() async {

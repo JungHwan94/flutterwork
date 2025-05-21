@@ -1,13 +1,27 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter05_instagram/style.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/rendering.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:intl/intl.dart';
+
+/*
+  * 이름을 클릭하면 profile 창 띄우기
+    - GestureDetector() : 제스처를 감지할 수 있도록 도와주는 위젯
+              속성            |         설명
+      -------------------------------------------------
+      onTap                   |   한번 클릭 했을 때
+      onDoubleTap             |   더블클릭 했을 때
+      onLongPress             |   길게 눌렀을 때
+      onPanUpdate             |   드래그시 위치 변환 감지
+      onHorizontalDragStart   |   가로 드래그
+      onVerticalDragStart     |   세로 드래그
+ */
 void main() {
   runApp(
       MaterialApp(
@@ -30,27 +44,6 @@ class _MyAppState extends State<MyApp> {
   var userImage;
   var userContent;
 
-  saveData() async {
-    final storage = await SharedPreferences.getInstance();
-    List<String> stringList = feedItems.map((item) => jsonEncode(item)).toList();
-    await storage.setStringList('items', stringList);
-  }
-
-  loadData() async {
-    final storage = await SharedPreferences.getInstance();
-    List<String>? stringList = storage.getStringList('items');
-    if(stringList != null) {
-      List<Map<String, dynamic>> restorage =
-      stringList.map((item) => jsonDecode(item) as Map<String, dynamic>).toList();
-
-      setState(() {
-        feedItems = restorage;
-      });
-    } else {
-      getData();
-    }
-  }
-
   setUserContent(newContent) {
     setState(() {
       userContent = newContent;
@@ -59,6 +52,7 @@ class _MyAppState extends State<MyApp> {
 
   addMyData() {
     String formattedDate = DateFormat('MMM dd').format(DateTime.now());
+
     var myData = {
       "id": feedItems.length,
       "image": userImage,
@@ -71,13 +65,12 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       feedItems.insert(0, myData);
     });
-    saveData();
   }
 
   @override
   void initState() {
     super.initState();
-    loadData();
+    getData();
   }
 
   getData() async {
@@ -108,8 +101,6 @@ class _MyAppState extends State<MyApp> {
               onPressed: () async{
                 var picker = ImagePicker();
                 var image = await picker.pickImage(source: ImageSource.gallery);
-                // ImageSource.camera  -> 카메라로 직접 찍음
-                // picker.pickMultiImage() -> 이미지 여러개 선택. 리스트로 들어옴
                 if(image != null) {
                   userImage = File(image.path);
                 }
@@ -211,8 +202,41 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('좋아요  ${widget.feedItems[i]['likes']}'),
-                        Text('글쓴이  ${widget.feedItems[i]['user']}'),
-                        Text('내용  ${widget.feedItems[i]['content']}')
+                        GestureDetector(
+                          child: Text('글쓴이  ${widget.feedItems[i]['user']}'),
+                          onTap: (){
+                            Navigator.push(
+                                context,
+                                // MaterialPageRoute(builder: (context) => Profile())
+
+                                // CupertinoPageRoute(builder: (context) => Profile())   // 슬라이드
+
+                                /*  fadein
+                          PageRouteBuilder(
+                            // a1 : 0~1사이의 값 -> 새페이지 전환의 진행정도, a2 : 기존페이지 전환 진행정도
+                            pageBuilder: (context, a1, a2) =>
+                              FadeTransition(opacity: a1, child: Profile())
+                             ,transitionDuration: Duration(milliseconds: 1000),
+                          )
+                          */
+
+                                // slide애니메이션
+                                PageRouteBuilder(
+                                    pageBuilder: (context, a1, a2) => Profile(),
+                                    transitionsBuilder: (context, a1, a2, child) =>
+                                        SlideTransition(
+                                          position: Tween(
+                                              begin: Offset(0.0, 1.0),
+                                              end: Offset(0.0, 0.0)
+                                          ).animate(a1),
+                                          child: child,
+                                        )
+                                )
+                            );
+                          } ,
+                        ),
+                        Text('내용  ${widget.feedItems[i]['content']}'),
+                        Text('날짜  ${widget.feedItems[i]['date']}')
                       ],
                     )
                 ),
@@ -225,6 +249,19 @@ class _HomeState extends State<Home> {
     }
   }
 }
+
+class Profile extends StatelessWidget {
+  const Profile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Text('profile page'),
+    );
+  }
+}
+
 
 class Upload extends StatelessWidget {
   const Upload({super.key, this.userImage, this.setUserContent, this.addMyData});
